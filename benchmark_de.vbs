@@ -12,6 +12,10 @@ sub DML_QUERY_PERFORMANCE_SET_CUSTOMER_DATA
 		Log.PushLogFolder(LogFolder)
 	call unit_execute_command("putty",DB_IP,"Putty","cd /autotest/benchmark/dbgen/bin/2.7.13/dbgen/"&"[Enter]") 'dbgen경로로 이동
 	call unit_execute_command("putty",DB_IP,"Putty","./dbgen -T -c -s 334"&"[Enter]") '5010만건 customer data생성
+	
+	if DB_INFO = "postgres"	then
+		call unit_execute_command("putty",DB_IP,"Putty","for i in `ls *.tbl`; do sed 's/|$//' $i > ${i/tbl/csv}; echo $i; done;") 'psql에서 bulk로 insert 하기위해 csv 변환
+	end if
 end sub
 
 
@@ -25,7 +29,7 @@ sub DML_QUERY_PERFORMANCE_SET_CUSTOMER_TABLE
 	else if DB_INFO = "postgres" then
 		call UNITS_EXEC_CREATE_TABLE_SCRIPT(strTableName,array(""),array("init_testdb_pgs.sql") 'db_info = psql일 때, drop test db > create test tb > create customer table
 		'copy data
-	end if
+		end if
 end sub
 
 
